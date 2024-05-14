@@ -90,12 +90,16 @@ class Car(TimeStampAbstractModel):
     drive = models.CharField('Привод', max_length=30, choices=DRIVE_CHOICES)
     rudder = models.CharField('Руль', max_length=30, choices=RUDDER_CHOICES)
     state = models.CharField('Состояние', max_length=30, choices=STATE_CHOICES)
+    transmission = models.ForeignKey('core.TransmissionCar', on_delete=models.CASCADE, related_name='car', verbose_name="Трансмиссия")
+    steering = models.ForeignKey('core.SteeringCar', on_delete=models.CASCADE, related_name='car', verbose_name="Рулевое управление")
+    suspension = models.ForeignKey('core.SuspensionCar', on_delete=models.CASCADE, related_name='car', verbose_name="Подвеска")
+    brake_system = models.ForeignKey('core.BrakeSystemCar', on_delete=models.CASCADE, related_name='car', verbose_name="Тормозная система")
     customs = models.BooleanField(verbose_name="Расстоможен")
     exchange = models.CharField(verbose_name='Обмен', max_length=30, choices=EXCHANGE_CHOICES)
     in_stock = models.CharField(verbose_name='В наличии', max_length=100, choices=IN_STOC_CHOICES)
+    registration = models.ForeignKey('core.Country', related_name='cars', on_delete=models.PROTECT, verbose_name="Выберите где зарегестрирован")
     region = models.ForeignKey('core.Region', related_name="cars", on_delete=models.PROTECT, verbose_name="Выберите регион")
     city = models.ForeignKey('core.City', related_name="cars", on_delete=models.PROTECT, verbose_name="Выберите город")
-    registration = models.ForeignKey('core.Country', related_name='cars', on_delete=models.PROTECT, verbose_name="Выберите где зарегестрирован")
     user = models.ForeignKey('auth.User', verbose_name='Пользователь', on_delete=models.CASCADE)
     content = models.TextField(verbose_name='Комментарий от автора')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена в сомах")
@@ -103,7 +107,6 @@ class Car(TimeStampAbstractModel):
     interiors = models.ManyToManyField('core.CarInterior', related_name="cars", verbose_name="Салон")
     securities = models.ManyToManyField('core.CarSecurity', related_name="cars", verbose_name="Безопасность")
     options = models.ManyToManyField('core.CarOptipon', related_name="cars", verbose_name="Опции")
-
     def __str__(self):
         return f'{self.id} {self.madel} - {self.year}'
 
@@ -127,6 +130,35 @@ class Madel(models.Model):
 
     def __str__(self):
         return f'{self.id} - {self.marka} - {self.name}'
+
+
+class SuspensionCar(models.Model):
+    class Meta:
+        verbose_name = 'Подвеска'
+        verbose_name_plural = 'Подвески'
+    name = models.CharField('Название подвески', max_length=100)
+
+
+class SteeringCar(models.Model):
+    class Meta:
+        verbose_name = 'Рулевое управление'
+        verbose_name_plural = 'Рулевое управление'
+    name = models.CharField('Название рулевого управления', max_length=100)
+
+
+class BrakeSystemCar(models.Model):
+    class Meta:
+        verbose_name = 'Тормозная система'
+        verbose_name_plural = 'Тормозная система'
+    name = models.CharField('Название тормозной системы', max_length=100)
+
+
+class TransmissionCar(models.Model):
+    class Meta:
+        verbose_name = 'Трансмиссия'
+        verbose_name_plural = 'Трансмиссии'
+    name = models.CharField('Название трансимссии', max_length=100)
+
 
 class Generations(models.Model):
     class Meta:
