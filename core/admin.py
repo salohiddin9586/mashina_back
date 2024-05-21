@@ -44,6 +44,10 @@ class CarAdmin(admin.ModelAdmin):
     
 
 admin.site.register(Marka)
+admin.site.register(TransmissionCar)
+admin.site.register(SteeringCar)
+admin.site.register(SuspensionCar)
+admin.site.register(BrakeSystemCar)
 admin.site.register(Madel)
 admin.site.register(Generations)
 admin.site.register(CarLookLike)

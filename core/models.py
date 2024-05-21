@@ -84,7 +84,7 @@ class Car(TimeStampAbstractModel):
     millage = models.PositiveIntegerField(verbose_name="Пробег")
     type = models.CharField(verbose_name="Кузов", max_length=100, choices=TYPE_CHOICES)
     color = models.ForeignKey('core.Color',verbose_name="Цвет", related_name='cars', on_delete=models.PROTECT)
-    engine = models.DecimalField(max_digits=2, decimal_places=1, default=0.0)
+    engine = models.DecimalField(verbose_name="обьем",max_digits=2, decimal_places=1, default=0.0)
     fuel = models.CharField('Топливо', max_length=30, choices=FUEL_CHOICES)
     gear = models.CharField('Коробка', max_length=30, choices=GEAR_CHOICES)
     drive = models.CharField('Привод', max_length=30, choices=DRIVE_CHOICES)
@@ -116,7 +116,7 @@ class Marka(TimeStampAbstractModel):
         verbose_name_plural = 'Марки'
     
     name = models.CharField(verbose_name="Название марки", max_length=100)
-    image = models.ImageField(verbose_name="Изображение", upload_to='car_image/')
+    image = models.ImageField(verbose_name="Изображение в формате png", upload_to='car_image/')
 
     def __str__(self):
         return f'{self.name}'
@@ -137,28 +137,32 @@ class SuspensionCar(models.Model):
         verbose_name = 'Подвеска'
         verbose_name_plural = 'Подвески'
     name = models.CharField('Название подвески', max_length=100)
-
+    def __str__(self):
+        return f"{self.name}"
 
 class SteeringCar(models.Model):
     class Meta:
         verbose_name = 'Рулевое управление'
         verbose_name_plural = 'Рулевое управление'
     name = models.CharField('Название рулевого управления', max_length=100)
-
+    def __str__(self):
+        return f"{self.name}"
 
 class BrakeSystemCar(models.Model):
     class Meta:
         verbose_name = 'Тормозная система'
         verbose_name_plural = 'Тормозная система'
     name = models.CharField('Название тормозной системы', max_length=100)
-
+    def __str__(self):
+        return f"{self.name}"
 
 class TransmissionCar(models.Model):
     class Meta:
         verbose_name = 'Трансмиссия'
         verbose_name_plural = 'Трансмиссии'
     name = models.CharField('Название трансимссии', max_length=100)
-
+    def __str__(self):
+        return f"{self.name}"
 
 class Generations(models.Model):
     class Meta:

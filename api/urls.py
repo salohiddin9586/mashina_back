@@ -17,6 +17,9 @@ urlpatterns = [
     path('colors/', list_and_create_color),
     path('colors/<int:id>/', detail_color),
 
+    path('generations/', list_and_create_generations),
+    path('generations/<int:id>/', detail_generations),
+
     path('countries/', list_and_create_country),
     path('countries/<int:id>/', detail_country),
 

@@ -1,4 +1,5 @@
 from rest_framework import status
+from django.contrib.humanize.templatetags.humanize import intcomma
 from django.db.models import Q
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
@@ -38,7 +39,7 @@ def list_and_create_car(request):
 
     qs_count = cars.count()
 
-    pagin = Paginator(cars, int(request.GET.get('page_size') or 5))
+    pagin = Paginator(cars, int(request.GET.get('page_size') or 6))
     page = int(request.GET.get('page') or 1)
 
     if 1 > page or page > pagin.num_pages:
@@ -84,7 +85,7 @@ def list_and_create_marks(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     marks = Marka.objects.all()
-    serializer = MarkSerializer(marks, many=True)
+    serializer = MarkSerializer(marks, many=True, context={'request': request})
     return Response(serializer.data)
 
 
@@ -162,6 +163,36 @@ def detail_madel(request, id):
     detail_serializer = DetailMadelSerializer(
         instance=madel, context={'request': request})
     return Response(detail_serializer.data)
+
+
+@api_view(['POST', 'GET'])
+def list_and_create_generations(request):
+    if request.method == 'POST':
+        serializer = GenerationsSerializer(
+            data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    generations = Generations.objects.all()
+    serializer = GenerationsSerializer(
+        instance=generations, many=True, context={'request': request})
+    return Response(serializer.data)
+
+
+@api_view(['GET', 'DELETE', 'PATCH'])
+def detail_generations(request, id):
+    generations = get_object_or_404(Generations, id=id)
+    if request.method == 'DELETE':
+        generations.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    if request.method == 'PATCH':
+        serializer = GenerationsSerializer(
+            instance=generations, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    serializer = GenerationsSerializer(instance=generations, context={'request': request})
+    return Response(serializer.data)
 
 
 @api_view(['POST', 'GET'])

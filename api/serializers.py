@@ -125,23 +125,33 @@ class CarSerializer(serializers.ModelSerializer):
         exclude = ('user',)
 
 
+class CarImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CarImage
+        fields = '__all__'
+    
+
+
 class ListCarSerializer(serializers.ModelSerializer):
     registration = CountrySerializer()
     region = RegionSerializer()
     generation = GenerationsSerializer()
     city = CitySerializer()
     color = ColorSerializer()
-    madel = MadelSerializer()
+    madel = DetailMadelSerializer()
     user = UserSerializer()
+    images = CarImageSerializer(many=True)
     look_likes = LooksLikesCarSerializer(many=True)
     interiors = InteriorsCarSerializer(many=True)
     securities = SecutitiesCarSerializer(many=True)
     options = OptionsCarSerializer(many=True)
 
+
     class Meta:
         model = Car
         exclude = ('content',)
-    
+
+
 
 class DetailCarSerializer(serializers.ModelSerializer):
     registration = CountrySerializer()
@@ -151,6 +161,7 @@ class DetailCarSerializer(serializers.ModelSerializer):
     color = ColorSerializer()
     madel = MadelSerializer()
     user = UserSerializer()
+    images = CarImageSerializer(many=True)
     look_likes = LooksLikesCarSerializer(many=True)
     interiors = InteriorsCarSerializer(many=True)
     securities = SecutitiesCarSerializer(many=True)
@@ -161,11 +172,6 @@ class DetailCarSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
-class CarImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CarImage
-        fields = '__all__'
 
 
 class CreateCarSerializer(serializers.ModelSerializer):
