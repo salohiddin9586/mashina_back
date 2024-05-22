@@ -1,5 +1,9 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.contrib.auth.views import get_user_model
+
+
+User = get_user_model()
 
 
 class TimeStampAbstractModel(models.Model):
@@ -8,6 +12,7 @@ class TimeStampAbstractModel(models.Model):
 
     class Meta:
         abstract = True
+
 
 
 class Car(TimeStampAbstractModel):
@@ -100,7 +105,7 @@ class Car(TimeStampAbstractModel):
     registration = models.ForeignKey('core.Country', related_name='cars', on_delete=models.PROTECT, verbose_name="Выберите где зарегестрирован")
     region = models.ForeignKey('core.Region', related_name="cars", on_delete=models.PROTECT, verbose_name="Выберите регион")
     city = models.ForeignKey('core.City', related_name="cars", on_delete=models.PROTECT, verbose_name="Выберите город")
-    user = models.ForeignKey('auth.User', verbose_name='Пользователь', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
     content = models.TextField(verbose_name='Комментарий от автора')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена в сомах")
     look_likes = models.ManyToManyField('core.CarLookLike', related_name="cars", verbose_name="Внешний вид")

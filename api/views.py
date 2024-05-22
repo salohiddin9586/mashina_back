@@ -1,11 +1,14 @@
+from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.db.models import Q
+from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from django.core.paginator import Paginator
 from rest_framework.response import Response
 from api.filters import CarFilter
+from rest_framework.generics import GenericAPIView
 from .serializers import *
 from core.models import *
 
@@ -387,3 +390,40 @@ def detail_securities(request, id):
     serializer = SecutitiesCarSerializer(
         instance=securities, context={'request': request})
     return Response(serializer.data)
+
+
+
+class LoginApiView(GenericAPIView):
+
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data.get('email')
+        password = serializer.validated_data.get('password')
+        user = authenticate(email=email, password=password)
+        if user:
+            token, created = Token.objects.get_or_create(user=user)
+            user_serializer = UserSerializer(user, context={'request': request})
+            return Response({
+                **user_serializer.data,
+                'token': token.key
+            })
+        return Response({'detail': 'Не существуеет пользователя либо неверный пароль.'}, status.HTTP_400_BAD_REQUEST)
+
+
+class RegisterApiView(GenericAPIView):
+
+    serializer_class = RegisterSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        token, created = Token.objects.get_or_create(user=user)
+        user_serializer = UserSerializer(user, context={'request': request})
+        return Response({
+            **user_serializer.data,
+            'token': token.key
+        })

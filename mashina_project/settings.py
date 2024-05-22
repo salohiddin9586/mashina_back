@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'rest_framework',
 
+    'account',
     'core',
     'api',
 ]
@@ -151,6 +152,8 @@ CORS_ALLOW_HEADERS = (
 # ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+AUTH_USER_MODEL = 'account.User'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
