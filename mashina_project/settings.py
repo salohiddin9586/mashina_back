@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'ckeditor',
     'rest_framework',
+    'rest_framework.authtoken',
+    'django_filters',
 
     'account',
     'core',
@@ -86,8 +88,12 @@ WSGI_APPLICATION = 'mashina_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'cardb',
+        'USER': 'nursultan',
+        'PASSWORD': 'nur120808',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -154,6 +160,19 @@ CORS_ALLOW_HEADERS = (
 CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL = 'account.User'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

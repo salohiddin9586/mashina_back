@@ -3,9 +3,9 @@ from rest_framework import serializers
 from core.models import *
 from django.contrib.auth.password_validation import validate_password
 from drf_extra_fields.fields import Base64ImageField
-from django.contrib.auth.models import User
+from account.models import User
+from rest_framework.authtoken.models import Token
 from django.contrib.auth.hashers import make_password
-
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,6 +34,13 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ('password', 'last_login', 'is_staff', 'is_active', 'date_joined', 'groups', 'user_permissions')
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = Token
+        fields = '__all__'
 
 
 class RegionSerializer(serializers.ModelSerializer):
@@ -112,8 +119,14 @@ class DetailMadelSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class GenerationsSerializer(serializers.ModelSerializer):
+class DetailGenerationsSerializer(serializers.ModelSerializer):
     madel = MadelSerializer()
+    class Meta:
+        model = Generations
+        fields = '__all__'
+
+
+class GenerationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Generations
         fields = '__all__'
@@ -121,11 +134,22 @@ class GenerationsSerializer(serializers.ModelSerializer):
 
 
 class CarSerializer(serializers.ModelSerializer):
-
+    images = serializers.ListSerializer(child=Base64ImageField(), required=False)   
     class Meta:
         model = Car
         exclude = ('user',)
 
+    def update(self, instance, validated_data):
+        images = validated_data.pop('images', [])
+        car = super().update(instance, validated_data)
+        for image in images:
+            image_name = image.name
+            image_file = image
+
+            car_image = CarImage.objects.create(car=car)
+            car_image.image.save(image_name, image_file)
+        return car
+    
 
 class CarImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -137,7 +161,7 @@ class CarImageSerializer(serializers.ModelSerializer):
 class ListCarSerializer(serializers.ModelSerializer):
     registration = CountrySerializer()
     region = RegionSerializer()
-    generation = GenerationsSerializer()
+    generation = DetailGenerationsSerializer()
     city = CitySerializer()
     color = ColorSerializer()
     madel = DetailMadelSerializer()
@@ -158,7 +182,7 @@ class ListCarSerializer(serializers.ModelSerializer):
 class DetailCarSerializer(serializers.ModelSerializer):
     registration = CountrySerializer()
     region = RegionSerializer()
-    generation = GenerationsSerializer()
+    generation = DetailGenerationsSerializer()
     city = CitySerializer()
     color = ColorSerializer()
     madel = MadelSerializer()
@@ -177,7 +201,7 @@ class DetailCarSerializer(serializers.ModelSerializer):
 
 
 class CreateCarSerializer(serializers.ModelSerializer):
-    images = serializers.ListSerializer(child=Base64ImageField(), required=False)
+    images = serializers.ListSerializer(child=Base64ImageField(), required=False)   
 
     class Meta:
         model = Car
@@ -204,33 +228,36 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
 
-
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
         exclude = ('is_staff', 'is_active', 'password', 'is_superuser', 'groups', 'user_permissions')
 
-    def to_representation(self, instance):
-        # instance in self.context['request'].user.favorite_products.all()
-        ret = super().to_representation(instance)
-        ret['is_admin'] = instance.is_superuser 
-        return ret
+    # def to_representation(self, instance):
+    #     # instance in self.context['request'].user.favorite_products.all()
+    #     ret = super().to_representation(instance)
+    #     ret['is_admin'] = instance.is_superuser 
+    #     return ret
+
+
+
+
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-
+    avatar = Base64ImageField()  # Используем Base64ImageField вместо ListSerializer
     password1 = serializers.CharField(validators=[validate_password])
     password2 = serializers.CharField()
 
     class Meta:
         model = User
-        exclude = ('is_staff', 'is_active', 'password', 'is_superuser', 'groups', 'user_permissions', 'phone')
+        exclude = ('is_staff', 'is_active', 'password', 'is_superuser', 'groups', 'user_permissions',)
 
     def validate(self, attrs):
         password1 = attrs.get('password1')
         password2 = attrs.get('password2')
-
+        
         if password1 != password2:
             raise serializers.ValidationError({
                 'password2': ['Пароли не совпадают!']
@@ -242,4 +269,5 @@ class RegisterSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password1')
         validated_data.pop('password2')
         validated_data['password'] = make_password(password)
+
         return super().create(validated_data)

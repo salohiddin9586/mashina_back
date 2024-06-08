@@ -95,17 +95,13 @@ class Car(TimeStampAbstractModel):
     drive = models.CharField('Привод', max_length=30, choices=DRIVE_CHOICES)
     rudder = models.CharField('Руль', max_length=30, choices=RUDDER_CHOICES)
     state = models.CharField('Состояние', max_length=30, choices=STATE_CHOICES)
-    transmission = models.ForeignKey('core.TransmissionCar', on_delete=models.CASCADE, related_name='car', verbose_name="Трансмиссия")
-    steering = models.ForeignKey('core.SteeringCar', on_delete=models.CASCADE, related_name='car', verbose_name="Рулевое управление")
-    suspension = models.ForeignKey('core.SuspensionCar', on_delete=models.CASCADE, related_name='car', verbose_name="Подвеска")
-    brake_system = models.ForeignKey('core.BrakeSystemCar', on_delete=models.CASCADE, related_name='car', verbose_name="Тормозная система")
     customs = models.BooleanField(verbose_name="Расстоможен")
     exchange = models.CharField(verbose_name='Обмен', max_length=30, choices=EXCHANGE_CHOICES)
     in_stock = models.CharField(verbose_name='В наличии', max_length=100, choices=IN_STOC_CHOICES)
     registration = models.ForeignKey('core.Country', related_name='cars', on_delete=models.PROTECT, verbose_name="Выберите где зарегестрирован")
     region = models.ForeignKey('core.Region', related_name="cars", on_delete=models.PROTECT, verbose_name="Выберите регион")
     city = models.ForeignKey('core.City', related_name="cars", on_delete=models.PROTECT, verbose_name="Выберите город")
-    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE, related_name="car")
     content = models.TextField(verbose_name='Комментарий от автора')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена в сомах")
     look_likes = models.ManyToManyField('core.CarLookLike', related_name="cars", verbose_name="Внешний вид")
@@ -174,7 +170,7 @@ class Generations(models.Model):
         verbose_name = 'Поколение'
         verbose_name_plural = 'Поколении'
     madel = models.ForeignKey('core.Madel', related_name="generation", on_delete=models.CASCADE, verbose_name="Выберите модел")
-    name = models.CharField('Название поколение', max_length=100, unique=True)
+    name = models.CharField('Название поколение', max_length=100, unique=False)
 
     def __str__(self):
         return f'{self.name}'
@@ -257,6 +253,18 @@ class Country(models.Model):
         return f'{self.name}'
 
 
+class City(models.Model):
+    class Meta:
+        verbose_name = 'Город'
+        verbose_name_plural = 'Городы'
+    name = models.CharField(verbose_name="Название города", max_length=50, unique=True)
+    region = models.ForeignKey('core.Region', related_name='city', on_delete=models.CASCADE, verbose_name="Выберите область")
+    
+    def __str__(self):
+        return f'{self.name} - {self.region.name}'
+    
+
+
 class Region(models.Model):
     class Meta:
         verbose_name = 'Регион'
@@ -268,13 +276,3 @@ class Region(models.Model):
         return f'{self.name} - {self.country.name}'
 
 
-class City(models.Model):
-    class Meta:
-        verbose_name = 'Город'
-        verbose_name_plural = 'Городы'
-    name = models.CharField(verbose_name="Название города", max_length=50, unique=True)
-    region = models.ForeignKey('core.Region', related_name='city', on_delete=models.CASCADE, verbose_name="Выберите область")
-    
-    def __str__(self):
-        return f'{self.name} - {self.region.name}'
-    

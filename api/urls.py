@@ -1,43 +1,30 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from .views import *
 
+router = DefaultRouter()
+router.register('cars', CarViewSet)
+router.register('nopagin', ViewSetPagin, basename="nopagin")
+router.register('marks', MarkViewSet, basename="marks")
+router.register('models', CarModelViewSet, basename="madels")
+router.register('colors', ColorViewSet, basename="colors")
+router.register('generations', GenerationsViewSet, basename="generations")
+router.register('countries', CountryViewSet, basename="countries")
+router.register('regions', RegionViewSet, basename="regions")
+router.register('cyties', CityViewSet, basename="cyties")
+router.register('look_likes', LooksLikesViewSet, basename="look_likes")
+router.register('interiors', InteriorsViewSet, basename="interiors")
+router.register('securities', SecuritiesViewSet, basename="securities")
+router.register('options', OptionsViewSet, basename="options")
+router.register('tokens', TokenViewSet, basename="tokens")
+router.register('images', CarImageViewSet, basename="images")
 urlpatterns = [
-    path('models/', list_and_create_madel),
-    path('models/<int:id>/', detail_madel),
+    path('user/<int:id>', UserViewSet.as_view()),
 
-    path('marks/', list_and_create_marks),
-    path('marks/<int:id>/', detail_update_delete_mark),
+    path('auth/login/', LoginApiView.as_view()),
+    path('auth/register/', RegisterApiView.as_view()),
+    
+    path('redactor_profile/<int:id>/', RedactorProfileApiView.as_view()),
 
-    path('cars/', list_and_create_car),
-    path('cars/<int:id>/', detail_car),
-
-    path('cars-images/', create_car_image),
-    path('cars-images/<int:id>/', detail_car_image),
-
-    path('colors/', list_and_create_color),
-    path('colors/<int:id>/', detail_color),
-
-    path('generations/', list_and_create_generations),
-    path('generations/<int:id>/', detail_generations),
-
-    path('countries/', list_and_create_country),
-    path('countries/<int:id>/', detail_country),
-
-    path('regions/', list_and_create_region),
-    path('regions/<int:id>/', detail_region),
-
-    path('cyties/', list_and_create_city),
-    path('cyties/<int:id>/', detail_city),
-
-    path('look_likes/', list_look_likes),
-    path('look_likes/<int:id>/', detail_look_likes),
-
-    path('interiors/', list_interiors),
-    path('interiors/<int:id>/', detail_interiors),
-
-    path('secutities/', list_securities),
-    path('secutities/<int:id>/', detail_securities),
-
-    path('options/', list_options),
-    path('options/<int:id>/', detail_options),
+    path('', include(router.urls)),
 ]
