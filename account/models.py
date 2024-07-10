@@ -23,7 +23,7 @@ class User(AbstractUser):
 
     username = None
     avatar = models.ImageField(upload_to='avatars/', verbose_name='аватарка', null=True, blank=True)
-    phone = PhoneNumberField(max_length=100, unique=True, verbose_name='номер телефона')
+    phone = PhoneNumberField(max_length=100, verbose_name='номер телефона')
     email = models.EmailField(blank=True, verbose_name='электронная почта', unique=True)
     role = models.CharField('роль', choices=ROLE, default=CLIENT, max_length=15)
 
